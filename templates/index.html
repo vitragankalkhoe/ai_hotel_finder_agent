@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Staywise AI — Hotel Finder</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static',filename='style.css') }}">
+</head>
+
+<body>
+    <aside class="sidebar"><a class="brand" href="/"><span class="logo">S</span><span><b>staywise</b><small>AI TRAVEL
+                    CONCIERGE</small></span></a>
+        <p class="side-label">WORKSPACE</p><a class="nav active" href="#discover">⌂ &nbsp; Discover stays</a><a
+            class="nav" href="#assistant">✦ &nbsp; AI concierge</a><a class="nav" href="#booking">▣ &nbsp; Booking
+            preview</a>
+        <div class="side-card"><span>✦</span>
+            <h3>Your next stay,<br>thoughtfully chosen.</h3>
+            <p>Tell the AI what matters. Compare stays with confidence.</p><a href="#assistant">Meet your concierge
+                ↗</a>
+        </div>
+        <div class="side-bottom"><span class="avatar">AI</span>
+            <div><b>Workshop Demo</b><small>Local environment</small></div><span class="pill">● Demo</span>
+        </div>
+    </aside>
+    <main>
+        <header class="topbar"><span>Workspace　/　<b>Hotel discovery</b></span><span class="local">⌑ Local demo
+                mode</span></header>
+        <section class="hero" id="discover">
+            <div>
+                <div class="eyebrow">✦ YOUR AI TRAVEL CONCIERGE</div>
+                <h1>Find a stay that<br><em>feels just right.</em></h1>
+                <p>Thoughtful recommendations for your next great getaway. Your preferences lead the way.</p><a
+                    class="cta" href="#assistant">Explore with AI　↘</a>
+                <div class="trust">✦ Personalised suggestions　　⌑ Transparent demo pricing</div>
+            </div>
+            <div class="hero-photo"><img
+                    src="https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&w=1400&q=90"
+                    alt="Illustrative hotel resort">
+                <div class="float-note">✦ <span><b>Made around you</b><small>Budget · comfort ·
+                            experience</small></span></div>
+                <div class="photo-caption">CURATED FOR YOUR JOURNEY<h3>Find your kind of escape.</h3>
+                </div>
+            </div>
+        </section>
+        <div class="notice"><b>ⓘ Workshop demo data</b>
+            <p>Hotel listings, photos, ratings and prices are illustrative. No real availability is checked, and no real
+                reservation or payment is made.</p>
+        </div>
+        <section id="assistant" class="section">
+            <div class="section-head">
+                <div>
+                    <div class="eyebrow">THE SMART WAY TO STAY</div>
+                    <h2>Your personal <em>stay finder</em></h2>
+                </div><span class="ai-chip">✦ GROQ-POWERED AI</span>
+            </div>
+            <div class="assistant">
+                <div class="spark">✦</div>
+                <div class="assistant-body">
+                    <div class="assist-title"><b>Tell me what your ideal stay looks like</b><span>● Ready to help</span>
+                    </div>
+                    <p>Share your destination, budget, who’s travelling and the amenities you care about.</p><textarea
+                        id="preferences" rows="3"
+                        placeholder="e.g. A family-friendly stay in Goa under ₹7,000 per night, with a pool and breakfast..."></textarea>
+                    <div class="prompts"><small>Try a prompt:</small><button
+                            data-prompt="A family-friendly hotel in Goa under ₹7000 per night with a pool and breakfast.">Family
+                            getaway</button><button
+                            data-prompt="A budget-friendly hotel in Kolhapur under ₹2500 with parking and breakfast.">Budget
+                            stay</button><button
+                            data-prompt="A premium mountain stay in Manali with scenic views and a cafe.">Mountain
+                            escape</button></div>
+                    <div class="assist-footer"><small>Recommendations use the local demo hotel catalogue.</small><button
+                            class="primary" id="recommendBtn">Ask AI to recommend ↗</button></div>
+                    <div id="recommendationResult" class="result hidden" aria-live="polite"></div>
+                </div>
+            </div>
+        </section>
+        <section class="section">
+            <div class="section-head">
+                <div>
+                    <div class="eyebrow">A FEW PLACES TO BEGIN</div>
+                    <h2>Stays worth <em>exploring</em></h2>
+                </div><span><b id="resultCount">{{ hotels|length }}</b> demo stays</span>
+            </div>
+            <div class="filters"><label>DESTINATION<select id="cityFilter">
+                        <option value="">All destinations</option>{% for city in
+                        hotels|map(attribute='city')|unique|sort %}<option>{{ city }}</option>{% endfor %}
+                    </select></label><label>MAX / NIGHT<select id="priceFilter">
+                        <option value="">Any budget</option>
+                        <option value="2500">Up to ₹2,500</option>
+                        <option value="3500">Up to ₹3,500</option>
+                        <option value="5000">Up to ₹5,000</option>
+                        <option value="7000">Up to ₹7,000</option>
+                        <option value="10000">Up to ₹10,000</option>
+                    </select></label><label>MIN. RATING<select id="ratingFilter">
+                        <option value="">Any rating</option>
+                        <option value="4.2">4.2+</option>
+                        <option value="4.5">4.5+</option>
+                        <option value="4.7">4.7+</option>
+                    </select></label><label>GUESTS<select id="guestFilter">
+                        <option value="1">1 guest</option>
+                        <option value="2">2 guests</option>
+                        <option value="3">3 guests</option>
+                        <option value="4">4 guests</option>
+                        <option value="5">5 guests</option>
+                    </select></label><button id="clearFilters" class="reset">Reset</button></div>
+            <div id="hotelGrid" class="hotel-grid">{% for h in hotels %}<article class="hotel-card">
+                    <div class="hotel-image"><img src="{{ h.image }}" alt="{{ h.name }}"><span class="category">{{
+                            h.category }}</span><button class="heart">♡</button></div>
+                    <div class="hotel-body"><small class="location">⌖ {{ h.city }}</small>
+                        <div class="hotel-title">
+                            <h3>{{ h.name }}</h3><span class="rating">★ {{ h.rating }}</span>
+                        </div>
+                        <p>{{ h.description }}</p>
+                        <div class="amenities">{% for a in h.amenities[:3] %}<span>{{ a }}</span>{% endfor %}</div>
+                        <div class="hotel-bottom">
+                            <div><strong>₹{{ "{:,.0f}".format(h.price_per_night) }}</strong><small>/ night · demo
+                                    price</small></div><button class="choose" data-id="{{ h.id }}">Choose stay
+                                →</button>
+                        </div>
+                    </div>
+                </article>{% endfor %}</div>
+            <div id="emptyState" class="empty hidden">No stays match these filters. Try widening your budget or changing
+                the destination.</div>
+        </section>
+        <section class="section" id="booking">
+            <div class="section-head">
+                <div>
+                    <div class="eyebrow">YOUR NEXT STEP</div>
+                    <h2>Preview your <em>stay</em></h2>
+                </div><span class="step">STEP 02 / CONFIRMATION</span>
+            </div>
+            <div class="booking-layout">
+                <div class="form-panel">
+                    <div class="form-heading"><span>01</span>
+                        <div><b>Stay details</b><small>Choose dates and number of guests</small></div>
+                    </div>
+                    <form id="bookingForm"><label>Selected hotel<select id="selectedHotel" required>
+                                <option value="">Choose a stay above</option>{% for h in hotels %}<option
+                                    value="{{ h.id }}">{{ h.name }} — {{ h.city }}</option>{% endfor %}
+                            </select></label>
+                        <div class="two"><label>Check-in<input id="checkIn" type="date" min="{{ today }}"
+                                    required></label><label>Check-out<input id="checkOut" type="date" min="{{ today }}"
+                                    required></label></div><label>Guests<select id="bookingGuests">
+                                <option value="1">1 guest</option>
+                                <option value="2" selected>2 guests</option>
+                                <option value="3">3 guests</option>
+                                <option value="4">4 guests</option>
+                                <option value="5">5 guests</option>
+                            </select></label><button type="submit" class="secondary full">Preview booking ↗</button>
+                    </form>
+                    <div class="form-heading guest-heading"><span>02</span>
+                        <div><b>Guest information</b><small>For this local demo record only</small></div>
+                    </div>
+                    <div class="two"><label>Full name<input id="guestName" placeholder="Guest name"
+                                maxlength="100"></label><label>Email address<input id="guestEmail" type="email"
+                                placeholder="you@example.com" maxlength="160"></label></div>
+                </div>
+                <div class="summary-panel">
+                    <div class="summary-top">YOUR ESTIMATE <span>▤</span></div>
+                    <div id="summaryEmpty" class="summary-empty">
+                        <div class="home-icon">⌂</div><b>Your stay summary will appear here</b>
+                        <p>Select a hotel and dates, then preview your booking to see the estimate.</p>
+                    </div>
+                    <div id="summaryDetails" class="hidden">
+                        <div class="summary-hotel"><img id="summaryImage" alt="">
+                            <div><b id="summaryHotelName"></b><small id="summaryHotelCity"></small><small
+                                    id="summaryRating"></small></div>
+                        </div>
+                        <div class="summary-line"><span id="nightLabel">Room × 0 nights</span><b
+                                id="summarySubtotal"></b></div>
+                        <div class="summary-line"><span>Illustrative taxes (12%)</span><b id="summaryTaxes"></b></div>
+                        <div class="summary-total"><span>Estimated total</span><strong id="summaryTotal"></strong></div>
+                        <div class="notice small-notice">ⓘ Estimate only. No payment is collected.</div><label
+                            class="check"><input type="checkbox" id="confirmCheckbox"><span>I understand this is a demo
+                                booking and want to save this record locally.</span></label><button id="confirmBooking"
+                            class="primary full" disabled>Confirm demo booking ↗</button>
+                    </div>
+                    <div id="bookingResult" class="result hidden" aria-live="polite"></div>
+                </div>
+            </div>
+        </section>
+        <footer><a class="brand" href="/"><span class="logo">S</span><span><b>staywise</b><small>AI TRAVEL
+                        CONCIERGE</small></span></a><span>Built for an Agentic AI workshop · Fictional demo
+                data</span><a href="#discover">Back to top ↑</a></footer>
+    </main>
+    <div id="toast" class="toast hidden"></div>
+    <script>window.HOTEL_DATA = {{ hotels | tojson }}; window.GROQ_ENABLED = {{ groq_enabled | tojson }};</script>
+    <script src="{{ url_for('static',filename='app.js') }}"></script>
+</body>
+
+</html>
